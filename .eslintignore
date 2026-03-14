@@ -1,0 +1,4 @@
+node_modules
+dist
+coverage
+docker/mongo-init.js
