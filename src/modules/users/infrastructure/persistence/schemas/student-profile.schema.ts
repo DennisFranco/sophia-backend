@@ -13,8 +13,6 @@ export class StudentProfile {
     type: Types.ObjectId,
     ref: 'User',
     required: true,
-    unique: true,
-    index: true,
   })
   userId!: Types.ObjectId;
 

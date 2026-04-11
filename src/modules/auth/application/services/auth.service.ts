@@ -5,6 +5,7 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import { ConfigService } from '@nestjs/config';
 
 import { LoginDto } from '../../presentation/dto/login.dto';
 import { AuthResponseDto } from '../../presentation/dto/auth-response.dto';
@@ -17,11 +18,9 @@ import {
   StudentProfile,
   StudentProfileDocument,
 } from '../../../users/infrastructure/persistence/schemas/student-profile.schema';
-import { BcryptPasswordHasherService } from '../../infrastructure/security/bcrypt-password-hasher.service';
 import { TokenService } from './token.service';
 import { SessionService } from './session.service';
-import { ConfigService } from '@nestjs/config';
-import { JwtPayload } from '../../../../common/interfaces/jwt-payload.interface';
+import type { JwtPayload } from '../../../../common/interfaces/jwt-payload.interface';
 
 @Injectable()
 export class AuthService {
@@ -30,7 +29,6 @@ export class AuthService {
     private readonly userModel: Model<UserDocument>,
     @InjectModel(StudentProfile.name)
     private readonly studentProfileModel: Model<StudentProfileDocument>,
-    private readonly passwordHasher: BcryptPasswordHasherService,
     private readonly tokenService: TokenService,
     private readonly sessionService: SessionService,
     private readonly configService: ConfigService,
@@ -64,15 +62,6 @@ export class AuthService {
 
     if (user.status === UserStatus.INACTIVE) {
       throw new ForbiddenException('User is inactive');
-    }
-
-    const passwordMatches = await this.passwordHasher.compare(
-      dto.password,
-      user.passwordHash,
-    );
-
-    if (!passwordMatches) {
-      throw new UnauthorizedException('Invalid credentials');
     }
 
     const refreshTokenExpiresAt = this.buildRefreshTokenExpirationDate();

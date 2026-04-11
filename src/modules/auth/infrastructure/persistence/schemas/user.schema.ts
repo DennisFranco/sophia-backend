@@ -18,32 +18,21 @@ export enum UserStatus {
 export class User {
   @Prop({
     required: true,
-    unique: true,
     trim: true,
     lowercase: true,
-    index: true,
   })
   institutionalEmail!: string;
 
   @Prop({
     required: true,
-    unique: true,
     trim: true,
-    index: true,
   })
   internalCode!: string;
-
-  @Prop({
-    required: true,
-    minlength: 8,
-  })
-  passwordHash!: string;
 
   @Prop({
     type: String,
     enum: Role,
     default: Role.STUDENT,
-    index: true,
   })
   role!: Role;
 
@@ -51,7 +40,6 @@ export class User {
     type: String,
     enum: UserStatus,
     default: UserStatus.ACTIVE,
-    index: true,
   })
   status!: UserStatus;
 

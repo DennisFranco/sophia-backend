@@ -27,13 +27,11 @@ export class UserSession {
     type: Types.ObjectId,
     ref: 'User',
     required: true,
-    index: true,
   })
   userId!: Types.ObjectId;
 
   @Prop({
     required: true,
-    index: true,
   })
   refreshTokenHash!: string;
 
@@ -51,13 +49,11 @@ export class UserSession {
 
   @Prop({
     default: false,
-    index: true,
   })
   isRevoked!: boolean;
 
   @Prop({
     required: true,
-    index: true,
   })
   expiresAt!: Date;
 
