@@ -10,9 +10,12 @@ import databaseConfig from './config/database.config';
 import aiConfig from './config/ai.config';
 import loggerConfig from './config/logger.config';
 import { envValidationSchema } from './config/env.validation';
+
 import { HealthModule } from './modules/health/health.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { SeedModule } from './modules/seed/seed.module';
+import { SubjectsModule } from './modules/subjects/subjects.module';
+import { TopicsModule } from './modules/topics/topics.module';
 
 @Module({
   imports: [
@@ -70,6 +73,8 @@ import { SeedModule } from './modules/seed/seed.module';
     HealthModule,
     AuthModule,
     SeedModule,
+    SubjectsModule,
+    TopicsModule,
   ],
 })
 export class AppModule {}

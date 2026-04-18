@@ -12,4 +12,16 @@ export class SeedController {
   async seedStudent() {
     return this.seedService.seedStudentUser();
   }
+
+  @Post('physics-2')
+  @ApiOperation({ summary: 'Seed Physics II subject and topics' })
+  async seedPhysics2() {
+    return this.seedService.seedPhysics2();
+  }
+
+  @Post('all')
+  @ApiOperation({ summary: 'Seed student user, profile, subject and topics' })
+  async seedAll() {
+    return this.seedService.seedAll();
+  }
 }
