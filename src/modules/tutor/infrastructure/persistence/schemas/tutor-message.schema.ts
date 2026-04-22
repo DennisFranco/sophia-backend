@@ -1,0 +1,74 @@
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { HydratedDocument, Types } from 'mongoose';
+import { TutorMessageRole } from '../../../../../common/enums/tutor-message-role.enum';
+
+export type TutorMessageDocument = HydratedDocument<TutorMessage>;
+
+@Schema({
+  collection: 'tutor_messages',
+  timestamps: { createdAt: true, updatedAt: false },
+  versionKey: false,
+})
+export class TutorMessage {
+  @Prop({
+    type: Types.ObjectId,
+    ref: 'TutorSession',
+    required: true,
+  })
+  sessionId!: Types.ObjectId;
+
+  @Prop({
+    type: Types.ObjectId,
+    ref: 'User',
+    required: true,
+  })
+  userId!: Types.ObjectId;
+
+  @Prop({
+    type: String,
+    enum: TutorMessageRole,
+    required: true,
+  })
+  role!: TutorMessageRole;
+
+  @Prop({
+    required: true,
+  })
+  content!: string;
+
+  @Prop({
+    required: false,
+  })
+  model?: string;
+
+  @Prop({
+    type: {
+      inputTokens: { type: Number, required: false },
+      outputTokens: { type: Number, required: false },
+      totalTokens: { type: Number, required: false },
+    },
+    _id: false,
+  })
+  tokenUsage?: {
+    inputTokens?: number;
+    outputTokens?: number;
+    totalTokens?: number;
+  };
+
+  @Prop({
+    type: {
+      code: { type: String, required: false },
+      message: { type: String, required: false },
+    },
+    _id: false,
+  })
+  error?: {
+    code?: string;
+    message?: string;
+  };
+}
+
+export const TutorMessageSchema = SchemaFactory.createForClass(TutorMessage);
+
+TutorMessageSchema.index({ sessionId: 1, createdAt: 1 });
+TutorMessageSchema.index({ userId: 1, createdAt: -1 });

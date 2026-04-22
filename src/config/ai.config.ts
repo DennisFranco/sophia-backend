@@ -1,8 +1,6 @@
 export default () => ({
   ai: {
-    openAiApiKey: process.env.OPENAI_API_KEY || '',
-    azureOpenAiApiKey: process.env.AZURE_OPENAI_API_KEY || '',
-    azureOpenAiEndpoint: process.env.AZURE_OPENAI_ENDPOINT || '',
-    azureOpenAiDeployment: process.env.AZURE_OPENAI_DEPLOYMENT || '',
+    geminiApiKey: process.env.GEMINI_API_KEY || '',
+    geminiModel: process.env.GEMINI_MODEL || 'gemini-3.1-flash-lite-preview',
   },
 });
