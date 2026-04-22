@@ -42,6 +42,6 @@ import {
     RefreshStrategy,
     BcryptPasswordHasherService,
   ],
-  exports: [AuthService],
+  exports: [AuthService, SessionService],
 })
 export class AuthModule {}

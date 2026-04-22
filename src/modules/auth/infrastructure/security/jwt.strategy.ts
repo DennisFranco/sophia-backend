@@ -7,13 +7,18 @@ import {
   type StrategyOptionsWithoutRequest,
 } from 'passport-jwt';
 
+import { SessionService } from '../../application/services/session.service';
 import type { JwtPayload } from '../../../../common/interfaces/jwt-payload.interface';
 import type { AuthenticatedUser } from '../../../../common/interfaces/authenticated-user.interface';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
-  constructor(configService: ConfigService) {
+  constructor(
+    configService: ConfigService,
+    private readonly sessionService: SessionService,
+  ) {
     const secret = configService.get<string>('auth.jwtAccessSecret');
+
     if (!secret) {
       throw new Error('auth.jwtAccessSecret is not configured');
     }
@@ -27,7 +32,12 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
     super(options);
   }
 
-  validate(payload: JwtPayload): AuthenticatedUser {
+  async validate(payload: JwtPayload): Promise<AuthenticatedUser> {
+    await this.sessionService.validateActiveSession(
+      payload.sessionId,
+      payload.sub,
+    );
+
     return {
       userId: payload.sub,
       email: payload.email,

@@ -7,28 +7,44 @@ import { CurrentUser } from '../../../../common/decorators/current-user.decorato
 import type { AuthenticatedUser } from '../../../../common/interfaces/authenticated-user.interface';
 
 @ApiTags('Progress')
-@ApiBearerAuth('access-token')
-@UseGuards(JwtAuthGuard)
 @Controller('progress')
+@UseGuards(JwtAuthGuard)
+@ApiBearerAuth('access-token')
 export class ProgressController {
   constructor(private readonly progressService: ProgressService) {}
 
-  @Get('overview')
-  @ApiOperation({ summary: 'Get current user progress overview' })
-  async getOverview(@CurrentUser() user: AuthenticatedUser) {
-    return this.progressService.getOverview(user.userId);
+  @Get('subjects/:subjectId/overview')
+  @ApiOperation({ summary: 'Get progress overview for a subject' })
+  async getOverview(
+    @CurrentUser() user: AuthenticatedUser,
+    @Param('subjectId') subjectId: string,
+  ) {
+    await this.progressService.ensureInitialProgressForUser(user.userId);
+    return this.progressService.recalculateUserStats(user.userId, subjectId);
   }
 
-  @Get('topics')
-  @ApiOperation({ summary: 'Get current user topic progress list' })
-  async getTopicsProgress(@CurrentUser() user: AuthenticatedUser) {
-    return this.progressService.getTopicProgressByUser(user.userId);
+  @Get('subjects/:subjectId/topics')
+  @ApiOperation({ summary: 'Get topic progress list for a subject' })
+  async getTopicProgressList(
+    @CurrentUser() user: AuthenticatedUser,
+    @Param('subjectId') subjectId: string,
+  ) {
+    await this.progressService.ensureInitialProgressForUser(user.userId);
+
+    const items = await this.progressService.getTopicProgressByUser(
+      user.userId,
+    );
+
+    return items.filter((item) => item.subjectId.toString() === subjectId);
   }
 
-  @Patch('topics/:topicId')
-  @ApiOperation({ summary: 'Update topic progress manually for MVP testing' })
+  @Patch('subjects/:subjectId/topics/:topicId')
+  @ApiOperation({
+    summary: 'Update topic progress manually for development/MVP',
+  })
   async updateTopicProgress(
     @CurrentUser() user: AuthenticatedUser,
+    @Param('subjectId') subjectId: string,
     @Param('topicId') topicId: string,
     @Body()
     body: {
@@ -40,6 +56,20 @@ export class ProgressController {
       timeStudiedSeconds?: number;
     },
   ) {
-    return this.progressService.updateTopicProgress(user.userId, topicId, body);
+    const result = await this.progressService.updateTopicProgress(
+      user.userId,
+      topicId,
+      body,
+    );
+
+    if (result.subjectId.toString() !== subjectId) {
+      return {
+        warning:
+          'Topic updated, but subjectId in path does not match topic subjectId',
+        progress: result,
+      };
+    }
+
+    return result;
   }
 }

@@ -11,15 +11,24 @@ import {
   TopicDocument,
 } from '../../../topics/infrastructure/persistence/schemas/topic.schema';
 import {
-  TopicProgress,
-  TopicProgressDocument,
-} from '../../../progress/infrastructure/persistence/schemas/topic-progress.schema';
-import {
   StudentProfile,
   StudentProfileDocument,
 } from '../../../users/infrastructure/persistence/schemas/student-profile.schema';
+import {
+  UserStats,
+  UserStatsDocument,
+} from '../../../progress/infrastructure/persistence/schemas/user-stats.schema';
+
 import { ProgressService } from '../../../progress/application/services/progress.service';
 import { TopicProgressStatus } from '../../../../common/enums/topic-progress-status.enum';
+
+type DashboardTopicProgressItem = {
+  topicId: {
+    _id: Types.ObjectId;
+  };
+  status: TopicProgressStatus;
+  progressPercent: number;
+};
 
 @Injectable()
 export class DashboardService {
@@ -29,16 +38,20 @@ export class DashboardService {
     private readonly subjectModel: Model<SubjectDocument>,
     @InjectModel(Topic.name)
     private readonly topicModel: Model<TopicDocument>,
-    @InjectModel(TopicProgress.name)
-    private readonly topicProgressModel: Model<TopicProgressDocument>,
     @InjectModel(StudentProfile.name)
     private readonly studentProfileModel: Model<StudentProfileDocument>,
+    @InjectModel(UserStats.name)
+    private readonly userStatsModel: Model<UserStatsDocument>,
   ) {}
 
   async getDashboard(userId: string) {
-    const activeSubject = await this.subjectModel
-      .findOne({ isActive: true })
-      .exec();
+    const userObjectId = new Types.ObjectId(userId);
+
+    const profile = await this.studentProfileModel.findOne({
+      userId: userObjectId,
+    });
+
+    const activeSubject = await this.subjectModel.findOne({ isActive: true });
 
     if (!activeSubject) {
       throw new NotFoundException('Active subject not found');
@@ -47,38 +60,57 @@ export class DashboardService {
     await this.progressService.ensureInitialProgressForUser(userId);
 
     const stats = await this.progressService.getOverview(userId);
-    const profile = await this.studentProfileModel.findOne({
-      userId: new Types.ObjectId(userId),
-    });
 
-    const recommendedTopic = await this.resolveRecommendedTopic(
-      userId,
-      activeSubject.id,
+    const topicProgressRaw =
+      await this.progressService.getTopicProgressByUser(userId);
+    const topicProgressList = topicProgressRaw as DashboardTopicProgressItem[];
+
+    const topics = await this.topicModel
+      .find({ subjectId: activeSubject._id })
+      .sort({ order: 1 });
+
+    const progressMap = new Map<string, DashboardTopicProgressItem>(
+      topicProgressList.map((item) => [String(item.topicId._id), item]),
     );
+
+    const recommendedTopic = this.resolveRecommendedTopic(
+      topics,
+      topicProgressList,
+    );
+
+    const recommendedPractice = recommendedTopic
+      ? this.buildSuggestedPractice(
+          recommendedTopic,
+          stats.overallProgressPercent,
+        )
+      : undefined;
 
     return {
       greeting: `Hola, ${profile?.firstName ?? 'Estudiante'}`,
+
       currentSubject: {
         id: activeSubject.id,
         name: activeSubject.name,
       },
+
       overallProgressPercent: stats.overallProgressPercent,
       currentStreakDays: stats.currentStreakDays,
+
       recommendedTopic: recommendedTopic
         ? {
-            id: recommendedTopic.topic.id,
-            name: recommendedTopic.topic.name,
-            slug: recommendedTopic.topic.slug,
-            progressPercent: recommendedTopic.progress.progressPercent,
-            status: recommendedTopic.progress.status,
+            id: recommendedTopic.id,
+            name: recommendedTopic.name,
+            progressPercent:
+              progressMap.get(recommendedTopic.id)?.progressPercent ?? 0,
+            status:
+              progressMap.get(recommendedTopic.id)?.status ??
+              TopicProgressStatus.NOT_STARTED,
+            shortDescription: recommendedTopic.shortDescription,
           }
         : undefined,
-      recommendedPractice: recommendedTopic
-        ? {
-            label: `Práctica sugerida de ${recommendedTopic.topic.name}`,
-            topicId: recommendedTopic.topic.id,
-          }
-        : undefined,
+
+      recommendedPractice,
+
       quickActions: [
         { key: 'continue-topic', label: 'Continuar tema' },
         { key: 'start-practice', label: 'Practicar' },
@@ -87,57 +119,58 @@ export class DashboardService {
     };
   }
 
-  private async resolveRecommendedTopic(userId: string, subjectId: string) {
-    const topics = await this.topicModel
-      .find({
-        subjectId: new Types.ObjectId(subjectId),
-        isActive: true,
-      })
-      .sort({ order: 1 })
-      .exec();
-
-    const progressList = await this.topicProgressModel
-      .find({
-        userId: new Types.ObjectId(userId),
-        subjectId: new Types.ObjectId(subjectId),
-      })
-      .exec();
-
-    const progressMap = new Map(
-      progressList.map((item) => [String(item.topicId), item]),
+  private resolveRecommendedTopic(
+    topics: TopicDocument[],
+    topicProgressList: DashboardTopicProgressItem[],
+  ): TopicDocument | undefined {
+    const progressMap = new Map<string, DashboardTopicProgressItem>(
+      topicProgressList.map((item) => [String(item.topicId._id), item]),
     );
 
-    for (const topic of topics) {
-      const progress = progressMap.get(String(topic._id));
-      if (progress?.status === TopicProgressStatus.IN_PROGRESS) {
-        return { topic, progress };
-      }
+    const inProgress = topics.find((topic) => {
+      const progress = progressMap.get(topic.id);
+      return progress?.status === TopicProgressStatus.IN_PROGRESS;
+    });
+
+    if (inProgress) {
+      return inProgress;
     }
 
-    for (const topic of topics) {
-      const progress = progressMap.get(String(topic._id));
-      if (!progress || progress.status === TopicProgressStatus.NOT_STARTED) {
-        return {
-          topic,
-          progress: progress ?? {
-            progressPercent: 0,
-            status: TopicProgressStatus.NOT_STARTED,
-          },
-        };
-      }
+    const notStarted = topics.find((topic) => {
+      const progress = progressMap.get(topic.id);
+      return !progress || progress.status === TopicProgressStatus.NOT_STARTED;
+    });
+
+    if (notStarted) {
+      return notStarted;
     }
 
-    if (topics[0]) {
-      const progress = progressMap.get(String(topics[0]._id));
-      return {
-        topic: topics[0],
-        progress: progress ?? {
-          progressPercent: 100,
-          status: TopicProgressStatus.COMPLETED,
-        },
-      };
+    return topics[0];
+  }
+
+  private buildSuggestedPractice(
+    topic: TopicDocument,
+    overallProgressPercent: number,
+  ) {
+    let difficulty = 'EASY';
+    let reason = 'Reforzar conceptos base.';
+
+    if (overallProgressPercent >= 30) {
+      difficulty = 'MEDIUM';
+      reason = 'Consolidar conocimiento.';
     }
 
-    return null;
+    if (overallProgressPercent >= 70) {
+      difficulty = 'HARD';
+      reason = 'Dominio avanzado.';
+    }
+
+    return {
+      topicId: topic.id,
+      topicName: topic.name,
+      difficulty,
+      estimatedMinutes: Math.max(10, Math.round(topic.estimatedMinutes * 0.3)),
+      reason,
+    };
   }
 }

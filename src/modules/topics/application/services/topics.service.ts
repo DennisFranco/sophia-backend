@@ -1,7 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-
+import { Model, Types } from 'mongoose';
 import {
   Topic,
   TopicDocument,
@@ -15,7 +14,11 @@ export class TopicsService {
   ) {}
 
   async findAll(subjectId?: string): Promise<TopicDocument[]> {
-    const filter = subjectId ? { subjectId } : {};
+    const filter: Record<string, unknown> = {};
+
+    if (subjectId) {
+      filter.subjectId = new Types.ObjectId(subjectId);
+    }
 
     return this.topicModel.find(filter).sort({ order: 1 }).exec();
   }

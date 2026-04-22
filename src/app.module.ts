@@ -16,6 +16,9 @@ import { AuthModule } from './modules/auth/auth.module';
 import { SeedModule } from './modules/seed/seed.module';
 import { SubjectsModule } from './modules/subjects/subjects.module';
 import { TopicsModule } from './modules/topics/topics.module';
+import { PracticeModule } from './modules/practice/practice.module';
+import { ProgressModule } from './modules/progress/progress.module';
+import { DashboardModule } from './modules/dashboard/dashboard.module';
 
 @Module({
   imports: [
@@ -75,6 +78,9 @@ import { TopicsModule } from './modules/topics/topics.module';
     SeedModule,
     SubjectsModule,
     TopicsModule,
+    PracticeModule,
+    ProgressModule,
+    DashboardModule,
   ],
 })
 export class AppModule {}

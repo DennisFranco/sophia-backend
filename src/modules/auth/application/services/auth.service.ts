@@ -66,12 +66,11 @@ export class AuthService {
 
     const refreshTokenExpiresAt = this.buildRefreshTokenExpirationDate();
 
-    const provisionalSessionId = 'temp';
     const provisionalTokens = await this.tokenService.generateTokenPair({
       userId: user.id,
       email: user.institutionalEmail,
       role: user.role,
-      sessionId: provisionalSessionId,
+      sessionId: 'temp',
     });
 
     const session = await this.sessionService.createSession({

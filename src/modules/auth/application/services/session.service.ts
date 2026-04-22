@@ -74,6 +74,36 @@ export class SessionService {
       throw new UnauthorizedException('Invalid refresh token');
     }
 
+    session.lastUsedAt = new Date();
+    await session.save();
+
+    return session;
+  }
+
+  async validateActiveSession(
+    sessionId: string,
+    userId: string,
+  ): Promise<UserSessionDocument> {
+    const session = await this.userSessionModel.findOne({
+      _id: new Types.ObjectId(sessionId),
+      userId: new Types.ObjectId(userId),
+    });
+
+    if (!session) {
+      throw new UnauthorizedException('Active session not found');
+    }
+
+    if (session.isRevoked) {
+      throw new UnauthorizedException('Session revoked');
+    }
+
+    if (session.expiresAt.getTime() < Date.now()) {
+      throw new UnauthorizedException('Session expired');
+    }
+
+    session.lastUsedAt = new Date();
+    await session.save();
+
     return session;
   }
 
