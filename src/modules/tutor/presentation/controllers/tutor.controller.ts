@@ -42,7 +42,7 @@ export class TutorController {
 
   @Post('sessions/:sessionId/messages')
   @Throttle({ default: { limit: 10, ttl: 60_000 } })
-  @ApiOperation({ summary: 'Send message to tutor' })
+  @ApiOperation({ summary: 'Send message to tutor and persist conversation' })
   async sendMessage(
     @CurrentUser() user: AuthenticatedUser,
     @Param('sessionId') sessionId: string,

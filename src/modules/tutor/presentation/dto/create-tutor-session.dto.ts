@@ -12,7 +12,7 @@ export class CreateTutorSessionDto {
   @IsMongoId()
   topicId?: string;
 
-  @ApiProperty({ required: false, maxLength: 120 })
+  @ApiProperty({ required: false })
   @IsOptional()
   @IsString()
   @MaxLength(120)

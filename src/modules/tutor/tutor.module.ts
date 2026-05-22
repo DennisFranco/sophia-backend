@@ -4,18 +4,22 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { AiModule } from '../../infrastructure/ai/ai.module';
 import { TutorService } from './application/services/tutor.service';
 import { TutorController } from './presentation/controllers/tutor.controller';
+
 import {
   TutorSession,
   TutorSessionSchema,
 } from './infrastructure/persistence/schemas/tutor-session.schema';
+
 import {
   TutorMessage,
   TutorMessageSchema,
 } from './infrastructure/persistence/schemas/tutor-message.schema';
+
 import {
   Topic,
   TopicSchema,
 } from '../topics/infrastructure/persistence/schemas/topic.schema';
+
 import {
   Subject,
   SubjectSchema,
