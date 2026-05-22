@@ -32,11 +32,13 @@ export class TutorMessage {
   role!: TutorMessageRole;
 
   @Prop({
+    type: String,
     required: true,
   })
   content!: string;
 
   @Prop({
+    type: String,
     required: false,
   })
   model?: string;

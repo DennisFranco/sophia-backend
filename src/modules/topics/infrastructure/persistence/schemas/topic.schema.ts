@@ -17,39 +17,46 @@ export class Topic {
   subjectId!: Types.ObjectId;
 
   @Prop({
+    type: String,
     required: true,
     trim: true,
   })
   slug!: string;
 
   @Prop({
+    type: String,
     required: true,
     trim: true,
   })
   name!: string;
 
   @Prop({
+    type: String,
     required: true,
     trim: true,
   })
   shortDescription!: string;
 
   @Prop({
+    type: String,
     trim: true,
   })
   contentSummary?: string;
 
   @Prop({
+    type: Number,
     required: true,
   })
   order!: number;
 
   @Prop({
+    type: Number,
     default: 90,
   })
   estimatedMinutes!: number;
 
   @Prop({
+    type: Boolean,
     default: true,
   })
   isActive!: boolean;

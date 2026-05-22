@@ -5,13 +5,13 @@ export type UserSessionDocument = HydratedDocument<UserSession>;
 
 @Schema({ _id: false, versionKey: false })
 export class SessionDeviceInfo {
-  @Prop()
+  @Prop({ type: String })
   platform?: string;
 
-  @Prop()
+  @Prop({ type: String })
   appVersion?: string;
 
-  @Prop()
+  @Prop({ type: String })
   deviceName?: string;
 }
 
@@ -31,6 +31,7 @@ export class UserSession {
   userId!: Types.ObjectId;
 
   @Prop({
+    type: String,
     required: true,
   })
   refreshTokenHash!: string;
@@ -41,23 +42,25 @@ export class UserSession {
   })
   deviceInfo?: SessionDeviceInfo;
 
-  @Prop()
+  @Prop({ type: String })
   ip?: string;
 
-  @Prop()
+  @Prop({ type: String })
   userAgent?: string;
 
   @Prop({
+    type: Boolean,
     default: false,
   })
   isRevoked!: boolean;
 
   @Prop({
+    type: Date,
     required: true,
   })
   expiresAt!: Date;
 
-  @Prop()
+  @Prop({ type: Date })
   lastUsedAt?: Date;
 }
 

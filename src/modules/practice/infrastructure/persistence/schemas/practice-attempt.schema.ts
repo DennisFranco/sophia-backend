@@ -19,17 +19,20 @@ export class PracticeAttemptAnswer {
   questionId!: Types.ObjectId;
 
   @Prop({
+    type: String,
     required: true,
     trim: true,
   })
   selectedAnswer!: string;
 
   @Prop({
+    type: Boolean,
     required: true,
   })
   isCorrect!: boolean;
 
   @Prop({
+    type: Date,
     required: true,
   })
   answeredAt!: Date;
@@ -81,29 +84,36 @@ export class PracticeAttempt {
   status!: PracticeAttemptStatus;
 
   @Prop({
+    type: Date,
     required: true,
   })
   startedAt!: Date;
 
-  @Prop()
+  @Prop({
+    type: Date,
+  })
   completedAt?: Date;
 
   @Prop({
+    type: Number,
     default: 0,
   })
   durationSeconds!: number;
 
   @Prop({
+    type: Number,
     default: 0,
   })
   totalQuestions!: number;
 
   @Prop({
+    type: Number,
     default: 0,
   })
   correctAnswers!: number;
 
   @Prop({
+    type: Number,
     default: 0,
   })
   scorePercent!: number;

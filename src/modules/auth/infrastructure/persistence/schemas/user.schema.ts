@@ -17,6 +17,7 @@ export enum UserStatus {
 })
 export class User {
   @Prop({
+    type: String,
     required: true,
     trim: true,
     lowercase: true,
@@ -24,6 +25,7 @@ export class User {
   institutionalEmail!: string;
 
   @Prop({
+    type: String,
     required: true,
     trim: true,
   })
@@ -43,8 +45,12 @@ export class User {
   })
   status!: UserStatus;
 
-  @Prop()
-  lastLoginAt?: Date;
+  @Prop({
+    type: Date,
+    required: false,
+    default: null,
+  })
+  lastLoginAt?: Date | null;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

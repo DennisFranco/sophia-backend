@@ -25,12 +25,14 @@ export class PracticeSet {
   topicId!: Types.ObjectId;
 
   @Prop({
+    type: String,
     required: true,
     trim: true,
   })
   title!: string;
 
   @Prop({
+    type: String,
     required: true,
     trim: true,
   })
@@ -44,11 +46,13 @@ export class PracticeSet {
   difficulty!: PracticeDifficulty;
 
   @Prop({
+    type: Number,
     default: 15,
   })
   estimatedMinutes!: number;
 
   @Prop({
+    type: Number,
     default: 0,
   })
   questionCount!: number;
@@ -60,6 +64,7 @@ export class PracticeSet {
   tags!: string[];
 
   @Prop({
+    type: Boolean,
     default: true,
   })
   isActive!: boolean;

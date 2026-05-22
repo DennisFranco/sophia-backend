@@ -24,6 +24,7 @@ export class UserStats {
   subjectId!: Types.ObjectId;
 
   @Prop({
+    type: Number,
     default: 0,
     min: 0,
     max: 100,
@@ -31,51 +32,62 @@ export class UserStats {
   overallProgressPercent!: number;
 
   @Prop({
+    type: Number,
     default: 0,
   })
   completedTopics!: number;
 
   @Prop({
+    type: Number,
     default: 0,
   })
   totalTopics!: number;
 
   @Prop({
+    type: Number,
     default: 0,
   })
   completedPractices!: number;
 
   @Prop({
+    type: Number,
     default: 0,
   })
   totalPracticeAttempts!: number;
 
   @Prop({
+    type: Number,
     default: 0,
   })
   totalCorrectAnswers!: number;
 
   @Prop({
+    type: Number,
     default: 0,
   })
   totalAnsweredQuestions!: number;
 
   @Prop({
+    type: Number,
     default: 0,
   })
   totalStudyTimeSeconds!: number;
 
   @Prop({
+    type: Number,
     default: 0,
   })
   currentStreakDays!: number;
 
   @Prop({
+    type: Number,
     default: 0,
   })
   longestStreakDays!: number;
 
-  @Prop()
+  @Prop({
+    type: Date,
+  })
   lastStudyDate?: Date;
 
   @Prop({
@@ -90,6 +102,7 @@ export class UserStats {
   recommendedPracticeLabel?: string;
 
   @Prop({
+    type: Date,
     required: true,
     default: () => new Date(),
   })
