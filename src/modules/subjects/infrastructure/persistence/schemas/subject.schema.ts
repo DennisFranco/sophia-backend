@@ -10,46 +10,54 @@ export type SubjectDocument = HydratedDocument<Subject>;
 })
 export class Subject {
   @Prop({
+    type: String,
     required: true,
     trim: true,
   })
   code!: string;
 
   @Prop({
+    type: String,
     required: true,
     trim: true,
   })
   name!: string;
 
   @Prop({
+    type: String,
     required: true,
     trim: true,
   })
   description!: string;
 
   @Prop({
+    type: String,
     trim: true,
     default: 'Fundación Universitaria Católica Lumen Gentium',
   })
   institutionName!: string;
 
   @Prop({
+    type: String,
     trim: true,
     default: 'Ingeniería de Sistemas',
   })
   programName!: string;
 
   @Prop({
+    type: Number,
     default: 4,
   })
   semester!: number;
 
   @Prop({
+    type: Boolean,
     default: true,
   })
   isActive!: boolean;
 
   @Prop({
+    type: Number,
     default: 1,
   })
   order!: number;

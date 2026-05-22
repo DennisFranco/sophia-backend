@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 import {
@@ -28,12 +28,16 @@ function extractRefreshTokenFromBody(request: Request): string | null {
 
 @Injectable()
 export class RefreshStrategy extends PassportStrategy(Strategy, 'jwt-refresh') {
-  constructor(configService: ConfigService) {
+  constructor(
+    @Inject(ConfigService)
+    private readonly configService: ConfigService,
+  ) {
     const refreshTokenExtractor: JwtFromRequestFunction = (
       request: Request,
     ): string | null => extractRefreshTokenFromBody(request);
 
     const secret = configService.get<string>('auth.jwtRefreshSecret');
+
     if (!secret) {
       throw new Error('auth.jwtRefreshSecret is not configured');
     }
