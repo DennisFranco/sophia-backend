@@ -1,12 +1,20 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Types } from 'mongoose';
-import { TutorMessageRole } from '../../../../../common/enums/tutor-message-role.enum';
 
 export type TutorMessageDocument = HydratedDocument<TutorMessage>;
 
+export enum TutorMessageRole {
+  USER = 'USER',
+  ASSISTANT = 'ASSISTANT',
+  SYSTEM = 'SYSTEM',
+}
+
 @Schema({
   collection: 'tutor_messages',
-  timestamps: { createdAt: true, updatedAt: false },
+  timestamps: {
+    createdAt: true,
+    updatedAt: false,
+  },
   versionKey: false,
 })
 export class TutorMessage {
@@ -34,10 +42,12 @@ export class TutorMessage {
   @Prop({
     type: String,
     required: true,
+    trim: true,
   })
   content!: string;
 
   @Prop({
+    trim: true,
     type: String,
     required: false,
   })
@@ -50,6 +60,7 @@ export class TutorMessage {
       totalTokens: { type: Number, required: false },
     },
     _id: false,
+    required: false,
   })
   tokenUsage?: {
     inputTokens?: number;
@@ -63,6 +74,7 @@ export class TutorMessage {
       message: { type: String, required: false },
     },
     _id: false,
+    required: false,
   })
   error?: {
     code?: string;
@@ -74,3 +86,4 @@ export const TutorMessageSchema = SchemaFactory.createForClass(TutorMessage);
 
 TutorMessageSchema.index({ sessionId: 1, createdAt: 1 });
 TutorMessageSchema.index({ userId: 1, createdAt: -1 });
+TutorMessageSchema.index({ sessionId: 1, role: 1 });

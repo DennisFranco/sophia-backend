@@ -70,4 +70,4 @@ export const TutorSessionSchema = SchemaFactory.createForClass(TutorSession);
 
 TutorSessionSchema.index({ userId: 1, createdAt: -1 });
 TutorSessionSchema.index({ userId: 1, status: 1 });
-TutorSessionSchema.index({ topicId: 1 });
+TutorSessionSchema.index({ subjectId: 1, topicId: 1 });
