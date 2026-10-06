@@ -14,6 +14,7 @@ export class GeminiProvider implements AiProvider {
   private readonly client?: GoogleGenAI;
   private readonly model: string;
   private readonly enabled: boolean;
+  private readonly debugEnabled: boolean;
 
   constructor(
     @Inject(ConfigService)
@@ -25,14 +26,22 @@ export class GeminiProvider implements AiProvider {
       'ai.geminiModel',
       'gemini-3.1-flash-lite',
     );
+    this.debugEnabled = this.configService.get<boolean>('ai.debug', false);
 
     if (!apiKey) {
       this.enabled = false;
+      this.logger.warn(
+        `Gemini provider disabled: GEMINI_API_KEY is missing. model=${this.model}`,
+      );
       return;
     }
 
     this.client = new GoogleGenAI({ apiKey });
     this.enabled = true;
+
+    this.logger.log(
+      `Gemini provider configured. model=${this.model} apiKeyPresent=true`,
+    );
   }
 
   async generateTutorResponse(
@@ -60,6 +69,8 @@ export class GeminiProvider implements AiProvider {
           parts: [{ text: item.text }],
         })) ?? [];
 
+      // Gemini 3.x deprecó parámetros de muestreo como temperature.
+      // Usamos el valor por defecto del modelo para evitar incompatibilidades.
       const response = await this.client.models.generateContent({
         model: this.model,
         contents: [
@@ -71,7 +82,6 @@ export class GeminiProvider implements AiProvider {
         ],
         config: {
           systemInstruction: input.systemInstruction,
-          temperature: input.temperature ?? 0.3,
         },
       });
 
@@ -98,12 +108,11 @@ export class GeminiProvider implements AiProvider {
         fallbackUsed: false,
       };
     } catch (error: unknown) {
-      const normalizedMessage =
-        error instanceof Error
-          ? error.message
-          : 'Unknown Gemini provider error';
+      const normalized = this.normalizeProviderError(error);
 
-      this.logger.error('Gemini provider error', normalizedMessage);
+      this.logger.error(
+        `Gemini request failed. model=${this.model} name=${normalized.name ?? 'unknown'} status=${normalized.status ?? 'unknown'} message=${normalized.message}`,
+      );
 
       return {
         text: [
@@ -116,7 +125,37 @@ export class GeminiProvider implements AiProvider {
         outputTokens: 0,
         totalTokens: 0,
         inputTokens: 0,
+        ...(this.debugEnabled ? { providerError: normalized } : {}),
       };
     }
+  }
+
+  private normalizeProviderError(error: unknown): {
+    name?: string;
+    status?: number;
+    message: string;
+  } {
+    if (error instanceof Error) {
+      const withStatus = error as Error & {
+        status?: unknown;
+        statusCode?: unknown;
+      };
+
+      const rawStatus = withStatus.status ?? withStatus.statusCode;
+      const status = typeof rawStatus === 'number' ? rawStatus : undefined;
+
+      return {
+        name: error.name,
+        status,
+        message: error.message || 'Unknown Gemini provider error',
+      };
+    }
+
+    return {
+      message:
+        typeof error === 'string'
+          ? error
+          : 'Unknown Gemini provider error',
+    };
   }
 }

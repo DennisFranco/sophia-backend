@@ -24,6 +24,7 @@ export const envValidationSchema = Joi.object({
 
   GEMINI_API_KEY: Joi.string().allow('').optional(),
   GEMINI_MODEL: Joi.string().default('gemini-3.1-flash-lite'),
+  AI_DEBUG: Joi.boolean().truthy('true').falsy('false').default(false),
 
   OPENAI_API_KEY: Joi.string().allow('').optional(),
   AZURE_OPENAI_API_KEY: Joi.string().allow('').optional(),

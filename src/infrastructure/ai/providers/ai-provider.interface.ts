@@ -5,7 +5,6 @@ export interface GenerateTutorResponseInput {
     role: 'user' | 'model';
     text: string;
   }>;
-  temperature?: number;
 }
 
 export interface GenerateTutorResponseResult {
@@ -15,6 +14,11 @@ export interface GenerateTutorResponseResult {
   outputTokens?: number;
   totalTokens?: number;
   fallbackUsed?: boolean;
+  providerError?: {
+    name?: string;
+    status?: number;
+    message: string;
+  };
 }
 
 export interface AiProvider {
