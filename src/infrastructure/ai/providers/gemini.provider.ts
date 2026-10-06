@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { GoogleGenAI } from '@google/genai';
 
@@ -15,8 +15,12 @@ export class GeminiProvider implements AiProvider {
   private readonly model: string;
   private readonly enabled: boolean;
 
-  constructor(private readonly configService: ConfigService) {
+  constructor(
+    @Inject(ConfigService)
+    private readonly configService: ConfigService,
+  ) {
     const apiKey = this.configService.get<string>('ai.geminiApiKey');
+
     this.model = this.configService.get<string>(
       'ai.geminiModel',
       'gemini-3.1-flash-lite-preview',
@@ -98,6 +102,7 @@ export class GeminiProvider implements AiProvider {
         error instanceof Error
           ? error.message
           : 'Unknown Gemini provider error';
+
       this.logger.error('Gemini provider error', normalizedMessage);
 
       return {

@@ -16,31 +16,32 @@ export class StudentProfile {
   })
   userId!: Types.ObjectId;
 
-  @Prop({ required: true, trim: true })
+  @Prop({ type: String, required: true, trim: true })
   firstName!: string;
 
-  @Prop({ required: true, trim: true })
+  @Prop({ type: String, required: true, trim: true })
   lastName!: string;
 
-  @Prop({ required: true, trim: true })
+  @Prop({ type: String, required: true, trim: true })
   fullName!: string;
 
-  @Prop({ trim: true })
+  @Prop({ type: String, trim: true })
   universityCode?: string;
 
-  @Prop({ trim: true })
+  @Prop({ type: String, trim: true })
   faculty?: string;
 
   @Prop({
+    type: String,
     trim: true,
     default: 'Ingeniería de Sistemas',
   })
   program!: string;
 
-  @Prop()
+  @Prop({ type: Number })
   semester?: number;
 
-  @Prop()
+  @Prop({ type: String })
   avatarUrl?: string;
 
   @Prop({

@@ -39,6 +39,7 @@ export class TopicProgress {
   status!: TopicProgressStatus;
 
   @Prop({
+    type: Number,
     default: 0,
     min: 0,
     max: 100,
@@ -46,29 +47,36 @@ export class TopicProgress {
   progressPercent!: number;
 
   @Prop({
+    type: Number,
     default: 0,
   })
   completedExercises!: number;
 
   @Prop({
+    type: Number,
     default: 0,
   })
   totalExercises!: number;
 
   @Prop({
+    type: Number,
     default: 0,
   })
   correctAnswers!: number;
 
   @Prop({
+    type: Number,
     default: 0,
   })
   totalAnswered!: number;
 
-  @Prop()
+  @Prop({
+    type: Date,
+  })
   lastPracticedAt?: Date;
 
   @Prop({
+    type: Number,
     default: 0,
   })
   timeStudiedSeconds!: number;

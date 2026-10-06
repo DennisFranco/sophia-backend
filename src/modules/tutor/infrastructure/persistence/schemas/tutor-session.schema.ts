@@ -36,6 +36,7 @@ export class TutorSession {
   topicId?: Types.ObjectId;
 
   @Prop({
+    type: String,
     trim: true,
   })
   title?: string;
@@ -47,15 +48,19 @@ export class TutorSession {
   })
   status!: TutorSessionStatus;
 
-  @Prop()
+  @Prop({
+    type: Date,
+  })
   lastMessageAt?: Date;
 
   @Prop({
+    type: Number,
     default: 0,
   })
   messageCount!: number;
 
   @Prop({
+    type: String,
     default: 'gemini',
   })
   provider!: string;

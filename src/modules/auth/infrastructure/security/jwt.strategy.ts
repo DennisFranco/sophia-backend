@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 import {
@@ -14,7 +14,8 @@ import type { AuthenticatedUser } from '../../../../common/interfaces/authentica
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
   constructor(
-    configService: ConfigService,
+    @Inject(ConfigService)
+    private readonly configService: ConfigService,
     private readonly sessionService: SessionService,
   ) {
     const secret = configService.get<string>('auth.jwtAccessSecret');

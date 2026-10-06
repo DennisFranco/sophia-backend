@@ -11,12 +11,10 @@ import type { AiProvider } from '../../../../infrastructure/ai/providers/ai-prov
 import { buildTutorSystemInstruction } from '../../../../infrastructure/ai/prompts/prompt-builder';
 import {
   TutorSession,
-  TutorSessionDocument,
   TutorSessionStatus,
 } from '../../../tutor/infrastructure/persistence/schemas/tutor-session.schema';
 import {
   TutorMessage,
-  TutorMessageDocument,
 } from '../../../tutor/infrastructure/persistence/schemas/tutor-message.schema';
 import {
   Topic,
@@ -24,7 +22,6 @@ import {
 } from '../../../topics/infrastructure/persistence/schemas/topic.schema';
 import {
   Subject,
-  SubjectDocument,
 } from '../../../subjects/infrastructure/persistence/schemas/subject.schema';
 import { TutorMessageRole } from '../../../../common/enums/tutor-message-role.enum';
 
@@ -34,13 +31,13 @@ export class TutorService {
     @Inject('AI_PROVIDER')
     private readonly aiProvider: AiProvider,
     @InjectModel(TutorSession.name)
-    private readonly tutorSessionModel: Model<TutorSessionDocument>,
+    private readonly tutorSessionModel: Model<TutorSession>,
     @InjectModel(TutorMessage.name)
-    private readonly tutorMessageModel: Model<TutorMessageDocument>,
+    private readonly tutorMessageModel: Model<TutorMessage>,
     @InjectModel(Topic.name)
-    private readonly topicModel: Model<TopicDocument>,
+    private readonly topicModel: Model<Topic>,
     @InjectModel(Subject.name)
-    private readonly subjectModel: Model<SubjectDocument>,
+    private readonly subjectModel: Model<Subject>,
   ) {}
 
   async createSession(

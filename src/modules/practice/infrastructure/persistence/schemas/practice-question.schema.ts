@@ -37,6 +37,7 @@ export class PracticeQuestion {
   type!: PracticeQuestionType;
 
   @Prop({
+    type: String,
     required: true,
     trim: true,
   })
@@ -49,12 +50,14 @@ export class PracticeQuestion {
   options!: string[];
 
   @Prop({
+    type: String,
     required: true,
     trim: true,
   })
   correctAnswer!: string;
 
   @Prop({
+    type: String,
     trim: true,
   })
   explanation?: string;
@@ -67,6 +70,7 @@ export class PracticeQuestion {
   difficulty!: PracticeDifficulty;
 
   @Prop({
+    type: Number,
     required: true,
   })
   order!: number;

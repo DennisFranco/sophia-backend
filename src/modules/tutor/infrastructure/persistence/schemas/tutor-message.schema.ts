@@ -40,6 +40,7 @@ export class TutorMessage {
   role!: TutorMessageRole;
 
   @Prop({
+    type: String,
     required: true,
     trim: true,
   })
@@ -47,6 +48,8 @@ export class TutorMessage {
 
   @Prop({
     trim: true,
+    type: String,
+    required: false,
   })
   model?: string;
 
