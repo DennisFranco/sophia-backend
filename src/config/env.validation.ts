@@ -23,7 +23,7 @@ export const envValidationSchema = Joi.object({
   BCRYPT_SALT_ROUNDS: Joi.number().integer().min(8).max(14).default(10),
 
   GEMINI_API_KEY: Joi.string().allow('').optional(),
-  GEMINI_MODEL: Joi.string().default('gemini-3.1-flash-lite-preview'),
+  GEMINI_MODEL: Joi.string().default('gemini-3.1-flash-lite'),
 
   OPENAI_API_KEY: Joi.string().allow('').optional(),
   AZURE_OPENAI_API_KEY: Joi.string().allow('').optional(),

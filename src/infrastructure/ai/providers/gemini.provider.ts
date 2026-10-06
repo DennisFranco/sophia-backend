@@ -23,7 +23,7 @@ export class GeminiProvider implements AiProvider {
 
     this.model = this.configService.get<string>(
       'ai.geminiModel',
-      'gemini-3.1-flash-lite-preview',
+      'gemini-3.1-flash-lite',
     );
 
     if (!apiKey) {
