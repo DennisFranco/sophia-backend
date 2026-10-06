@@ -80,4 +80,13 @@ export class PracticeController {
   async getHistory(@CurrentUser() user: AuthenticatedUser) {
     return this.practiceService.getHistory(user.userId);
   }
+
+  @Get('attempts/:attemptId')
+  @ApiOperation({ summary: 'Get practice attempt detail by id' })
+  async getAttemptById(
+    @CurrentUser() user: AuthenticatedUser,
+    @Param('attemptId') attemptId: string,
+  ) {
+    return this.practiceService.getAttemptById(user.userId, attemptId);
+  }
 }

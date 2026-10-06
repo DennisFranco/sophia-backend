@@ -378,4 +378,98 @@ export class PracticeService {
       .populate('topicId')
       .exec();
   }
+
+  async getAttemptById(userId: string, attemptId: string) {
+    const attempt = await this.practiceAttemptModel
+      .findById(attemptId)
+      .populate('practiceSetId')
+      .populate('topicId')
+      .exec();
+
+    if (!attempt) {
+      throw new NotFoundException('Practice attempt not found');
+    }
+
+    if (attempt.userId.toString() !== userId) {
+      throw new BadRequestException(
+        'Practice attempt does not belong to current user',
+      );
+    }
+
+    const questions = await this.practiceQuestionModel
+      .find({
+        practiceSetId: attempt.practiceSetId,
+      })
+      .sort({ order: 1 })
+      .exec();
+
+    const answerMap = new Map(
+      attempt.answers.map((answer) => [
+        answer.questionId.toString(),
+        {
+          selectedAnswer: answer.selectedAnswer,
+          isCorrect: answer.isCorrect,
+        },
+      ]),
+    );
+
+    const isCompleted = attempt.status === PracticeAttemptStatus.COMPLETED;
+
+    const practiceSet = attempt.practiceSetId as unknown as {
+      id?: string;
+      _id?: { toString(): string };
+      title?: string;
+      description?: string;
+      difficulty?: string;
+      estimatedMinutes?: number;
+    };
+
+    const topic = attempt.topicId as unknown as {
+      id?: string;
+      _id?: { toString(): string };
+      name?: string;
+    };
+
+    return {
+      attemptId: attempt.id,
+      status: attempt.status,
+      practiceSet: {
+        id: practiceSet.id ?? practiceSet._id?.toString(),
+        title: practiceSet.title,
+        description: practiceSet.description,
+        difficulty: practiceSet.difficulty,
+        estimatedMinutes: practiceSet.estimatedMinutes,
+      },
+      topic: {
+        id: topic.id ?? topic._id?.toString(),
+        name: topic.name,
+      },
+      subjectId: attempt.subjectId.toString(),
+      startedAt: attempt.startedAt,
+      completedAt: attempt.completedAt ?? null,
+      durationSeconds: attempt.durationSeconds,
+      totalQuestions: attempt.totalQuestions,
+      correctAnswers: attempt.correctAnswers,
+      scorePercent: attempt.scorePercent,
+      questions: questions.map((question) => {
+        const answer = answerMap.get(question.id);
+
+        return {
+          id: question.id,
+          type: question.type,
+          prompt: question.prompt,
+          options: question.options,
+          order: question.order,
+          selectedAnswer: answer?.selectedAnswer ?? null,
+          isCorrect: answer?.isCorrect ?? null,
+          ...(isCompleted
+            ? {
+                correctAnswer: question.correctAnswer,
+                explanation: question.explanation,
+              }
+            : {}),
+        };
+      }),
+    };
+  }
 }

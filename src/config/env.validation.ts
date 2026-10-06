@@ -5,11 +5,13 @@ export const envValidationSchema = Joi.object({
     .valid('development', 'test', 'production')
     .default('development'),
 
-  PORT: Joi.number().default(3000),
+  PORT: Joi.number().port().default(3000),
 
   APP_NAME: Joi.string().default('SOPHIA Backend'),
   API_PREFIX: Joi.string().default('api/v1'),
   FRONTEND_URL: Joi.string().required(),
+  CORS_ORIGINS: Joi.string().allow('').optional(),
+  SWAGGER_ENABLED: Joi.boolean().truthy('true').falsy('false').optional(),
 
   MONGODB_URI: Joi.string().required(),
 
@@ -18,7 +20,10 @@ export const envValidationSchema = Joi.object({
   JWT_ACCESS_EXPIRES_IN: Joi.string().default('15m'),
   JWT_REFRESH_EXPIRES_IN: Joi.string().default('7d'),
 
-  BCRYPT_SALT_ROUNDS: Joi.number().min(8).max(14).default(10),
+  BCRYPT_SALT_ROUNDS: Joi.number().integer().min(8).max(14).default(10),
+
+  GEMINI_API_KEY: Joi.string().allow('').optional(),
+  GEMINI_MODEL: Joi.string().default('gemini-3.1-flash-lite-preview'),
 
   OPENAI_API_KEY: Joi.string().allow('').optional(),
   AZURE_OPENAI_API_KEY: Joi.string().allow('').optional(),
