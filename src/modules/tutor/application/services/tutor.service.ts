@@ -139,7 +139,6 @@ export class TutorService {
         }),
         userMessage: message,
         conversationHistory: history,
-        temperature: 0.3,
       });
 
       const assistantMessage = await this.tutorMessageModel.create({
@@ -165,6 +164,9 @@ export class TutorService {
         usage: assistantMessage.tokenUsage,
         model: assistantMessage.model,
         fallbackUsed: aiResponse.fallbackUsed ?? false,
+        ...(aiResponse.providerError
+          ? { providerError: aiResponse.providerError }
+          : {}),
         curriculumContext: {
           subject: subject?.name,
           topic: topic?.name,
